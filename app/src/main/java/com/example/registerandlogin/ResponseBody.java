@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 public class ResponseBody {
     @SerializedName("first_name")
     private String first_name;
-
     @SerializedName("last_name")
     private String last_name;
     @SerializedName("email")
