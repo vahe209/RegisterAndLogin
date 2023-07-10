@@ -10,11 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AccountPageActivity extends AppCompatActivity {
-    private EditText firstNameEdit;
-    private EditText lastNameEdit;
-    private EditText emailEdit;
-    private EditText phoneEdit;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,10 +23,10 @@ public class AccountPageActivity extends AppCompatActivity {
         String email = (String) userInfo.get("email");
         String phone = (String) userInfo.get("phone");
 
-        firstNameEdit = findViewById(R.id.firstName);
-        lastNameEdit = findViewById(R.id.lastName);
-        emailEdit = findViewById(R.id.email);
-        phoneEdit = findViewById(R.id.phone);
+        EditText firstNameEdit = findViewById(R.id.firstName);
+        EditText lastNameEdit = findViewById(R.id.lastName);
+        EditText emailEdit = findViewById(R.id.email);
+        EditText phoneEdit = findViewById(R.id.phone);
         firstNameEdit.setText(firstName);
         lastNameEdit.setText(lastName);
         emailEdit.setText(email);

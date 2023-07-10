@@ -78,7 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
         userInfo.put("email", email);
         userInfo.put("password", password);
         userInfo.put("phone", phone);
-        if (isValidEmail(email) && isValid(password)) {
+        if (isValidEmail(email) && isValidPassword(password)) {
             RetrofitClient client = new RetrofitClient();
             Call<ResponseBody> call = client.api.CreateUser(RetrofitClient.KEY, userInfo);
             call.enqueue(new Callback<ResponseBody>() {
@@ -115,7 +115,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isValid(String password) {
+    private boolean isValidPassword(String password) {
         String regex = "^(?=.*[0-9])" + "(?=.*[a-z])(?=.*[A-Z])" + "(?=.*[@#$%^&+=])" + "(?=\\S+$).{8,20}$";
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(password);
