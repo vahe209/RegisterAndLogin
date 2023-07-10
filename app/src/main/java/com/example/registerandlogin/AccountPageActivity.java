@@ -19,6 +19,7 @@ public class AccountPageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_page);
+
         Intent intent = getIntent();
         intent.getExtras();
         Map<String, Object> userInfo = (HashMap<String, Object>) intent.getSerializableExtra("map");
