@@ -1,35 +1,64 @@
 package com.example.registerandlogin;
 
-import static com.example.registerandlogin.RetrofitClient.KEY;
+import static com.example.registerandlogin.Retrofit.RetrofitClient.KEY;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.registerandlogin.Retrofit.Api;
+import com.example.registerandlogin.Retrofit.RetrofitClient;
+import com.example.registerandlogin.models.DataModel;
+import com.example.registerandlogin.models.UserDataModel;
+
 import java.util.HashMap;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-    private Button login;
-    private Button register;
+    private Api api;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        register = findViewById(R.id.register_btn);
-        login = findViewById(R.id.login_btn);
+        Button register = findViewById(R.id.register_btn);
+        Button login = findViewById(R.id.login_btn);
         register.setOnClickListener(v -> createRegisterActivity());
         login.setOnClickListener(v -> checkInfo());
+        api = RetrofitClient.getRetrofit().create(Api.class);
+        SharedPreferences sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE);
+        String token = sharedPreferences.getString("tokenOfSignedAccount", null);
+        if (token != null) {
+            Call<DataModel> call = api.getData(KEY, token);
+            call.enqueue(new Callback<DataModel>() {
+                @Override
+                public void onResponse(@NonNull Call<DataModel> call, @NonNull Response<DataModel> response) {
+                    if (!response.isSuccessful()) {
+                        System.out.println(response.code());
+                    }
+                    createActivity(response.body().getUserDataModel().getFirstName(),
+                                   response.body().getUserDataModel().getLastName(),
+                                   response.body().getUserDataModel().getEmail(),
+                                   response.body().getUserDataModel().getPhone());
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<DataModel> call, @NonNull Throwable t) {
+                    System.out.println(t.getMessage());
+                }
+            });
+        }
     }
 
     private void checkInfo() {
@@ -37,40 +66,44 @@ public class MainActivity extends AppCompatActivity {
         String email = emailEdit.getText().toString();
         EditText passwordEdit = findViewById(R.id.password_ed_text);
         String password = passwordEdit.getText().toString();
-
-        RetrofitClient client = new RetrofitClient();
-        Call<ResponseBody> call = client.api.loginUser(KEY, email, password);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                TextView incorrectData = findViewById(R.id.login_wrong_info);
-                if (!response.isSuccessful()) {
-                    System.out.println("code:" + response.code());
+        if (!email.isEmpty() && !password.isEmpty()) {
+            Call<UserDataModel> call = api.loginUser(KEY, email, password);
+            call.enqueue(new Callback<UserDataModel>() {
+                @Override
+                public void onResponse(Call<UserDataModel> call, @NonNull Response<UserDataModel> response) {
+                    TextView incorrectData = findViewById(R.id.login_wrong_info);
+                    if (!response.isSuccessful()) {
+                        System.out.println("code:" + response.code());
+                    }
+                    if (response.body() != null) {
+                        incorrectData.setVisibility(View.GONE);
+                        SharedPreferences prefs = getSharedPreferences("userData", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("tokenOfSignedAccount", response.body().getToken()).apply();
+                        createActivity(response.body().getFirstName(), response.body().getLastName(), response.body().getEmail(), response.body().getPhone());
+                    } else {
+                        incorrectData.setVisibility(View.VISIBLE);
+                    }
                 }
-                if (response.body() != null) {
-                    incorrectData.setVisibility(View.GONE);
-                    createActivity(response.body().getFirstName(), response.body().getLatName(), response.body().getEmail(), response.body().getPhone());
-                } else {
-                    incorrectData.setVisibility(View.VISIBLE);
-                }
-                return;
-            }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                System.out.println("Error");
-            }
-        });
+                @Override
+                public void onFailure(Call<UserDataModel> call, Throwable t) {
+                    System.out.println("Error");
+                }
+            });
+        } else {
+            Toast.makeText(MainActivity.this, "Fill all fields", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void createActivity(String firstName, String lastName, String email, String phone) {
-        Map<String, Object> userInfo = new HashMap();
+        HashMap<String, String> userInfo = new HashMap<>();
         userInfo.put("first_name", firstName);
         userInfo.put("last_name", lastName);
         userInfo.put("email", email);
         userInfo.put("phone", phone);
         Intent intent = new Intent(this, AccountPageActivity.class);
-        intent.putExtra("map", (HashMap) userInfo);
+        intent.putExtra("map", userInfo);
         startActivity(intent);
     }
 
@@ -79,5 +112,3 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 }
-
-

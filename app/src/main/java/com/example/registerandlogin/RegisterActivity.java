@@ -1,8 +1,10 @@
 package com.example.registerandlogin;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +12,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.registerandlogin.Retrofit.Api;
+import com.example.registerandlogin.Retrofit.RetrofitClient;
+import com.example.registerandlogin.models.UserDataModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +53,7 @@ public class RegisterActivity extends AppCompatActivity {
         loginBtn.setOnClickListener(v -> onBackPressed());
         Button registerBtn = findViewById(R.id.register_btn);
 
+
         fNameEdit = findViewById(R.id.firstName);
         lNameEdit = findViewById(R.id.lastName);
         emailEdit = findViewById(R.id.email);
@@ -65,6 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
             password = passwordEdit.getText().toString();
             passConfirm = passConfirmEdit.getText().toString();
             if (isFilledAndValid()) {
+                postData(firstName, lastName, email, password, phone);
             } else {
                 Toast.makeText(RegisterActivity.this, "Fill all fields", Toast.LENGTH_SHORT).show();
             }
@@ -72,6 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void postData(String firstName, String lastName, String email, String password, String phone) {
+        Api api = RetrofitClient.getRetrofit().create(Api.class);
         Map<String, Object> userInfo = new HashMap();
         userInfo.put("first_name", firstName);
         userInfo.put("last_name", lastName);
@@ -79,23 +88,25 @@ public class RegisterActivity extends AppCompatActivity {
         userInfo.put("password", password);
         userInfo.put("phone", phone);
         if (isValidEmail(email) && isValidPassword(password)) {
-            RetrofitClient client = new RetrofitClient();
-            Call<ResponseBody> call = client.api.CreateUser(RetrofitClient.KEY, userInfo);
-            call.enqueue(new Callback<ResponseBody>() {
+            Call<UserDataModel> call = api.CreateUser(RetrofitClient.KEY, userInfo);
+            call.enqueue(new Callback<UserDataModel>() {
 
                 @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                public void onResponse(@NonNull Call<UserDataModel> call, @NonNull Response<UserDataModel> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(RegisterActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
-                        ResponseBody body = response.body();
+                        UserDataModel body = response.body();
                         if (body != null) {
                             createActivity(userInfo);
+                            SharedPreferences sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("tokenOfSignedAccount", response.body().getToken()).apply();
                         }
                     }
                 }
 
                 @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                public void onFailure(@NonNull Call<UserDataModel> call, @NonNull Throwable t) {
                     System.out.println("Error found is : " + t.getMessage());
                 }
             });
@@ -103,7 +114,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private boolean isValidEmail(String email) {
-        String regex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        String regex = "^[A-Za-z\\d+_.-]+@(.+)$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
         if (matcher.matches()) {
@@ -116,7 +127,10 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private boolean isValidPassword(String password) {
-        String regex = "^(?=.*[0-9])" + "(?=.*[a-z])(?=.*[A-Z])" + "(?=.*[@#$%^&+=])" + "(?=\\S+$).{8,20}$";
+        String regex = "^(?=.*\\d)" +
+                       "(?=.*[a-z])(?=.*[A-Z])" +
+                       "(?=.*[@#$%^&+=])" +
+                       "(?=\\S+$).{8,20}$";
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(password);
         if (m.matches()) {
@@ -127,10 +141,10 @@ public class RegisterActivity extends AppCompatActivity {
             return false;
         }
     }
+
     private boolean isFilledAndValid() {
         if (!firstName.isEmpty() && !lastName.isEmpty() && !email.isEmpty() && !phone.isEmpty() && !password.isEmpty() && !passConfirm.isEmpty()) {
             if (password.equals(passConfirm)) {
-                postData(firstName, lastName, email, password, phone);
                 return true;
             } else {
                 Toast.makeText(RegisterActivity.this, "Password must be correct", Toast.LENGTH_SHORT).show();
