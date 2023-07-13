@@ -110,6 +110,7 @@ public class AccountPageActivity extends AppCompatActivity {
     }
 
     private void updateData() {
+        email = emailEdit.getText().toString();
         firstName = firstNameEdit.getText().toString();
         lastName = lastNameEdit.getText().toString();
         phone = phoneEdit.getText().toString();
@@ -120,6 +121,7 @@ public class AccountPageActivity extends AppCompatActivity {
         Map<String, Object> userInfo = new HashMap();
         userInfo.put("first_name", firstName);
         userInfo.put("last_name", lastName);
+        userInfo.put("username", email);
         userInfo.put("email", email);
         userInfo.put("password", password);
         userInfo.put("phone", phone);

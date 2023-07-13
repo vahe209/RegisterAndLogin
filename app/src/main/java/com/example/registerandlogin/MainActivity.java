@@ -47,10 +47,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!response.isSuccessful()) {
                         System.out.println(response.code());
                     }
-                    createActivity(response.body().getUserDataModel().getFirstName(),
-                                   response.body().getUserDataModel().getLastName(),
-                                   response.body().getUserDataModel().getEmail(),
-                                   response.body().getUserDataModel().getPhone());
+                    createPageActivity(response.body().getUserDataModel().getFirstName(), response.body().getUserDataModel().getLastName(), response.body().getUserDataModel().getEmail(), response.body().getUserDataModel().getPhone());
                 }
 
                 @Override
@@ -80,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                         SharedPreferences prefs = getSharedPreferences("userData", MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putString("tokenOfSignedAccount", response.body().getToken()).apply();
-                        createActivity(response.body().getFirstName(), response.body().getLastName(), response.body().getEmail(), response.body().getPhone());
+                        createPageActivity(response.body().getFirstName(), response.body().getLastName(), response.body().getEmail(), response.body().getPhone());
                     } else {
                         incorrectData.setVisibility(View.VISIBLE);
                     }
@@ -96,11 +93,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void createActivity(String firstName, String lastName, String email, String phone) {
+    private void createPageActivity(String firstName, String lastName, String email, String phone) {
         HashMap<String, String> userInfo = new HashMap<>();
         userInfo.put("first_name", firstName);
         userInfo.put("last_name", lastName);
         userInfo.put("email", email);
+        userInfo.put("username", email);
         userInfo.put("phone", phone);
         Intent intent = new Intent(this, AccountPageActivity.class);
         intent.putExtra("map", userInfo);

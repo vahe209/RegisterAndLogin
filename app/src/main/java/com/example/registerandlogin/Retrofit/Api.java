@@ -27,7 +27,7 @@ public interface Api {
     @POST("users/login")
     Call<UserDataModel> loginUser(
             @Query("key") String key,
-            @Field("email") String email,
+            @Field("username") String username,
             @Field("password") String password);
 
     @FormUrlEncoded
