@@ -2,13 +2,21 @@ package com.example.registerandlogin;
 
 import static com.example.registerandlogin.Retrofit.RetrofitClient.KEY;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -21,9 +29,16 @@ import com.example.registerandlogin.Retrofit.Api;
 import com.example.registerandlogin.Retrofit.RetrofitClient;
 import com.example.registerandlogin.models.UserDataModel;
 
+import java.io.File;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,18 +49,24 @@ public class AccountPageActivity extends AppCompatActivity {
     private static final int GALLERY_REQ_CODE = 1000;
     private ImageView profileImage;
     private Button changeDataBtn,
-                   cancelChanges;
+            cancelChanges,
+            savePngBtn;
+    private String path;
+    private Uri uri;
     private EditText firstNameEdit,
-                     lastNameEdit,
-                     emailEdit,
-                     phoneEdit,
-                     submitEdit;
+            lastNameEdit,
+            emailEdit,
+            phoneEdit,
+            submitEdit;
+    private Bitmap bitmap;
     private ConstraintLayout editLayout;
     private String firstName;
     private String lastName;
     private String email;
     private String phone;
     private String password;
+    private String token;
+    private String image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +80,17 @@ public class AccountPageActivity extends AppCompatActivity {
         lastName = (String) userInfo.get("last_name");
         email = (String) userInfo.get("email");
         phone = (String) userInfo.get("phone");
+        token = (String) userInfo.get("token");
+        image = (String) userInfo.get("img");
+
+
         api = RetrofitClient.getRetrofit().create(Api.class);
 
         firstNameEdit = findViewById(R.id.firstName);
         lastNameEdit = findViewById(R.id.lastName);
         emailEdit = findViewById(R.id.email);
         phoneEdit = findViewById(R.id.phone);
+
         ConstraintLayout imageLoader = findViewById(R.id.imgLoaderLayout);
         imageLoader.setOnClickListener(v -> loadImage());
         setUserData();
@@ -78,14 +104,38 @@ public class AccountPageActivity extends AppCompatActivity {
         cancelChanges = findViewById(R.id.cancel_changes_user_data_btn);
         cancelChanges.setOnClickListener(v -> cancelChanges());
         changeDataBtn.setText("Change data");
+        savePngBtn = findViewById(R.id.save_png);
+        savePngBtn.setVisibility(View.GONE);
+        savePngBtn.setOnClickListener(v -> saveImage());
         changeDataBtn.setOnClickListener(v -> changeData());
 
+    }
+
+    private void saveImage() {
+        File f = new File(path);
+        RequestBody reqFile = RequestBody.create(MediaType.parse(getContentResolver().getType(uri)), f);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", f.getName(), reqFile);
+        Call<UserDataModel> call = api.upload(KEY, token, body);
+        call.enqueue(new Callback<UserDataModel>() {
+            @Override
+            public void onResponse(Call<UserDataModel> call, Response<UserDataModel> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(AccountPageActivity.this, "Image Successfuly added", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(AccountPageActivity.this, "Something gone incorrect", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserDataModel> call, Throwable t) {
+                System.out.println(t.getMessage());
+            }
+        });
     }
 
     private void checkPassword() {
         password = submitEdit.getText().toString();
         if (!password.isEmpty()) {
-            api = RetrofitClient.getRetrofit().create(Api.class);
             Call<UserDataModel> call = api.loginUser(KEY, email, password);
             call.enqueue(new Callback<UserDataModel>() {
                 @Override
@@ -132,6 +182,7 @@ public class AccountPageActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<UserDataModel> call, @NonNull Response<UserDataModel> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(AccountPageActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+
                 }
             }
 
@@ -171,8 +222,29 @@ public class AccountPageActivity extends AppCompatActivity {
     private void loadImage() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, GALLERY_REQ_CODE);
+        launcher.launch(intent);
     }
+
+    ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                Intent data = result.getData();
+                uri = data.getData();
+                Context context = AccountPageActivity.this;
+                path = RealPathUtil.getRealPath(context, uri);
+
+
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    profileImage.setImageBitmap(bitmap);
+                    savePngBtn.setVisibility(View.VISIBLE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    });
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -191,5 +263,6 @@ public class AccountPageActivity extends AppCompatActivity {
         editLayout.setVisibility(View.VISIBLE);
         cancelChanges.setVisibility(View.VISIBLE);
     }
+
 
 }

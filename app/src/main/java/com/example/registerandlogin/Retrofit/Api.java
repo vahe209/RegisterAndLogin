@@ -1,19 +1,20 @@
 package com.example.registerandlogin.Retrofit;
 
-import android.service.autofill.UserData;
-
 import com.example.registerandlogin.models.DataModel;
 import com.example.registerandlogin.models.UserDataModel;
 
 import java.util.Map;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface Api {
@@ -41,6 +42,20 @@ public interface Api {
     Call<DataModel> getData(
             @Query("key") String key,
             @Header("token") String token);
+
+    @GET("users/profile_photo")
+    Call<DataModel> getFile(
+            @Query("key") String key,
+            @Header("token") String token);
+
+
+    @Multipart
+    @POST("users/profile_photo")
+    Call<UserDataModel> upload(
+            @Query("key") String key,
+            @Header("token") String token,
+            @Part MultipartBody.Part image);
+
 }
 
 

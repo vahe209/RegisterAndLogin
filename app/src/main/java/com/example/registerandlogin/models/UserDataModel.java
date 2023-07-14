@@ -15,6 +15,16 @@ public class UserDataModel {
     private String phone;
     @SerializedName("token")
     private String token;
+    @SerializedName("profile_picture")
+    private String img;
+
+    public Object getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
 
     public String getPassword() {
         return password;

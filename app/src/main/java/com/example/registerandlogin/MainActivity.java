@@ -4,6 +4,7 @@ import static com.example.registerandlogin.Retrofit.RetrofitClient.KEY;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +20,7 @@ import com.example.registerandlogin.Retrofit.RetrofitClient;
 import com.example.registerandlogin.models.DataModel;
 import com.example.registerandlogin.models.UserDataModel;
 
+import java.io.File;
 import java.util.HashMap;
 
 import retrofit2.Call;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button register = findViewById(R.id.register_btn);
@@ -47,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!response.isSuccessful()) {
                         System.out.println(response.code());
                     }
-                    createPageActivity(response.body().getUserDataModel().getFirstName(), response.body().getUserDataModel().getLastName(), response.body().getUserDataModel().getEmail(), response.body().getUserDataModel().getPhone());
+                    createPageActivity(response.body().getUserDataModel().getFirstName(), response.body().getUserDataModel().getLastName(), response.body().getUserDataModel().getEmail(), response.body().getUserDataModel().getPhone(), (String) response.body().getUserDataModel().getImg());
                 }
 
                 @Override
@@ -77,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                         SharedPreferences prefs = getSharedPreferences("userData", MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putString("tokenOfSignedAccount", response.body().getToken()).apply();
-                        createPageActivity(response.body().getFirstName(), response.body().getLastName(), response.body().getEmail(), response.body().getPhone());
+                        createPageActivity(response.body().getFirstName(), response.body().getLastName(), response.body().getEmail(), response.body().getPhone(), (String) response.body().getImg());
                     } else {
                         incorrectData.setVisibility(View.VISIBLE);
                     }
@@ -93,13 +96,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void createPageActivity(String firstName, String lastName, String email, String phone) {
-        HashMap<String, String> userInfo = new HashMap<>();
+    private void createPageActivity(String firstName, String lastName, String email, String phone, String file) {
+        HashMap<String, Object> userInfo = new HashMap<>();
+        SharedPreferences prefs = getSharedPreferences("userData", MODE_PRIVATE);
         userInfo.put("first_name", firstName);
         userInfo.put("last_name", lastName);
         userInfo.put("email", email);
         userInfo.put("username", email);
         userInfo.put("phone", phone);
+        userInfo.put("img", file);
+
+        String token = prefs.getString("tokenOfSignedAccount", "eroooor");
+        userInfo.put("token", token);
         Intent intent = new Intent(this, AccountPageActivity.class);
         intent.putExtra("map", userInfo);
         startActivity(intent);
