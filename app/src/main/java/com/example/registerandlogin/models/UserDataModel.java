@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public class UserDataModel {
     @SerializedName("first_name")
     private String first_name;
+
     @SerializedName("last_name")
     private String last_name;
 
@@ -18,7 +19,7 @@ public class UserDataModel {
     @SerializedName("profile_picture")
     private String img;
 
-    public Object getImg() {
+    public Object   getImg() {
         return img;
     }
 

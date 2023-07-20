@@ -1,5 +1,6 @@
 package com.example.registerandlogin;
 
+import static com.example.registerandlogin.Retrofit.RetrofitClient.IMG_BASE_URL;
 import static com.example.registerandlogin.Retrofit.RetrofitClient.KEY;
 
 import androidx.activity.result.ActivityResult;
@@ -15,7 +16,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -25,14 +25,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.registerandlogin.Retrofit.Api;
 import com.example.registerandlogin.Retrofit.RetrofitClient;
+import com.example.registerandlogin.models.DataModel;
 import com.example.registerandlogin.models.UserDataModel;
 
 import java.io.File;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,6 +69,7 @@ public class AccountPageActivity extends AppCompatActivity {
     private String token;
     private String image;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,8 +83,7 @@ public class AccountPageActivity extends AppCompatActivity {
         email = (String) userInfo.get("email");
         phone = (String) userInfo.get("phone");
         token = (String) userInfo.get("token");
-        image = (String) userInfo.get("img");
-
+        image = (String) userInfo.get("image");
 
         api = RetrofitClient.getRetrofit().create(Api.class);
 
@@ -90,11 +91,12 @@ public class AccountPageActivity extends AppCompatActivity {
         lastNameEdit = findViewById(R.id.lastName);
         emailEdit = findViewById(R.id.email);
         phoneEdit = findViewById(R.id.phone);
+        profileImage = findViewById(R.id.account_img);
 
         ConstraintLayout imageLoader = findViewById(R.id.imgLoaderLayout);
         imageLoader.setOnClickListener(v -> loadImage());
         setUserData();
-        profileImage = findViewById(R.id.account_img);
+
         changeDataBtn = findViewById(R.id.change_user_data_btn);
         makeEditTextClickable(false);
         submitEdit = findViewById(R.id.submit_edit);
@@ -109,6 +111,8 @@ public class AccountPageActivity extends AppCompatActivity {
         savePngBtn.setOnClickListener(v -> saveImage());
         changeDataBtn.setOnClickListener(v -> changeData());
 
+
+        //setProfileImage();
     }
 
     private void saveImage() {
@@ -120,7 +124,7 @@ public class AccountPageActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<UserDataModel> call, Response<UserDataModel> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(AccountPageActivity.this, "Image Successfuly added", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AccountPageActivity.this, "Image Successfully added", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(AccountPageActivity.this, "Something gone incorrect", Toast.LENGTH_SHORT).show();
                 }
@@ -198,6 +202,9 @@ public class AccountPageActivity extends AppCompatActivity {
         lastNameEdit.setText(lastName);
         emailEdit.setText(email);
         phoneEdit.setText(phone);
+        Glide.with(AccountPageActivity.this)
+                .load(IMG_BASE_URL+ image)
+                .into(profileImage);
     }
 
     private void cancelChanges() {
@@ -263,6 +270,8 @@ public class AccountPageActivity extends AppCompatActivity {
         editLayout.setVisibility(View.VISIBLE);
         cancelChanges.setVisibility(View.VISIBLE);
     }
+
+//    }
 
 
 }

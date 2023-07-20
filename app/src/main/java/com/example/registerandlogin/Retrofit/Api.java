@@ -1,5 +1,7 @@
 package com.example.registerandlogin.Retrofit;
 
+import com.example.registerandlogin.Icons.GetIconFromDirectory;
+import com.example.registerandlogin.baseColors.ColorsGetter;
 import com.example.registerandlogin.models.DataModel;
 import com.example.registerandlogin.models.UserDataModel;
 
@@ -43,18 +45,20 @@ public interface Api {
             @Query("key") String key,
             @Header("token") String token);
 
-    @GET("users/profile_photo")
-    Call<DataModel> getFile(
-            @Query("key") String key,
-            @Header("token") String token);
-
-
     @Multipart
     @POST("users/profile_photo")
     Call<UserDataModel> upload(
             @Query("key") String key,
             @Header("token") String token,
             @Part MultipartBody.Part image);
+
+    @GET("website/settings")
+    Call<ColorsGetter> getBgColor(
+            @Query("key") String key);
+
+    @GET("website/settings")
+    Call<GetIconFromDirectory> getBgIcon(
+            @Query("key") String key);
 
 }
 
