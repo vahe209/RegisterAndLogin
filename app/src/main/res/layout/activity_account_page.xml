@@ -89,13 +89,13 @@
 
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/save_png"
-                        android:text="Save Image"
-                        android:backgroundTint="@color/white"
-                        android:textColor="@color/red"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintEnd_toEndOf="parent"
                         android:layout_marginTop="20dp"
+                        android:backgroundTint="@color/white"
+                        android:text="Save Image"
+                        android:textColor="@color/red"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@+id/add_img_png"
                         app:layout_constraintTop_toBottomOf="@id/add_img_png_text" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -149,6 +149,7 @@
                 android:padding="15dp"
                 app:layout_constraintStart_toStartOf="@id/phone"
                 app:layout_constraintTop_toBottomOf="@id/phone" />
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/cancel_changes_user_data_btn"
                 android:layout_width="wrap_content"
@@ -162,28 +163,29 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/edit_layout"
-                android:visibility="gone"
-                android:layout_marginTop="20dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="@id/phone"
                 app:layout_constraintStart_toStartOf="@id/phone"
                 app:layout_constraintTop_toBottomOf="@id/change_user_data_btn">
-            <EditText
-                android:id="@+id/submit_edit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:hint="Write your password to submit changes"
-                />
-            <androidx.appcompat.widget.AppCompatButton
 
-                android:layout_marginTop="10dp"
-                android:id="@+id/submit_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/submit_edit"
-                android:text="Submit"/>
+                <EditText
+                    android:id="@+id/submit_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:hint="Write your password to submit changes" />
+
+                <androidx.appcompat.widget.AppCompatButton
+
+                    android:id="@+id/submit_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Submit"
+                    app:layout_constraintTop_toBottomOf="@id/submit_edit" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

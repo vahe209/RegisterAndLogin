@@ -26,9 +26,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.registerandlogin.PathUtil.RealPathUtil;
 import com.example.registerandlogin.Retrofit.Api;
 import com.example.registerandlogin.Retrofit.RetrofitClient;
-import com.example.registerandlogin.models.DataModel;
 import com.example.registerandlogin.models.UserDataModel;
 
 import java.io.File;
@@ -50,16 +50,15 @@ public class AccountPageActivity extends AppCompatActivity {
     private static final int GALLERY_REQ_CODE = 1000;
     private ImageView profileImage;
     private Button changeDataBtn,
-            cancelChanges,
-            savePngBtn;
+                   cancelChanges,
+                   savePngBtn;
     private String path;
     private Uri uri;
     private EditText firstNameEdit,
-            lastNameEdit,
-            emailEdit,
-            phoneEdit,
-            submitEdit;
-    private Bitmap bitmap;
+                     lastNameEdit,
+                     emailEdit,
+                     phoneEdit,
+                     submitEdit;
     private ConstraintLayout editLayout;
     private String firstName;
     private String lastName;
@@ -110,9 +109,6 @@ public class AccountPageActivity extends AppCompatActivity {
         savePngBtn.setVisibility(View.GONE);
         savePngBtn.setOnClickListener(v -> saveImage());
         changeDataBtn.setOnClickListener(v -> changeData());
-
-
-        //setProfileImage();
     }
 
     private void saveImage() {
@@ -129,7 +125,6 @@ public class AccountPageActivity extends AppCompatActivity {
                     Toast.makeText(AccountPageActivity.this, "Something gone incorrect", Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onFailure(Call<UserDataModel> call, Throwable t) {
                 System.out.println(t.getMessage());
@@ -154,7 +149,6 @@ public class AccountPageActivity extends AppCompatActivity {
                         Toast.makeText(AccountPageActivity.this, "Password is incorrect", Toast.LENGTH_SHORT).show();
                     }
                 }
-
                 @Override
                 public void onFailure(Call<UserDataModel> call, Throwable t) {
                     System.out.println(t.getMessage());
@@ -186,7 +180,6 @@ public class AccountPageActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<UserDataModel> call, @NonNull Response<UserDataModel> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(AccountPageActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
-
                 }
             }
 
@@ -240,10 +233,8 @@ public class AccountPageActivity extends AppCompatActivity {
                 uri = data.getData();
                 Context context = AccountPageActivity.this;
                 path = RealPathUtil.getRealPath(context, uri);
-
-
                 try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                     profileImage.setImageBitmap(bitmap);
                     savePngBtn.setVisibility(View.VISIBLE);
                 } catch (IOException e) {
@@ -270,8 +261,4 @@ public class AccountPageActivity extends AppCompatActivity {
         editLayout.setVisibility(View.VISIBLE);
         cancelChanges.setVisibility(View.VISIBLE);
     }
-
-//    }
-
-
 }

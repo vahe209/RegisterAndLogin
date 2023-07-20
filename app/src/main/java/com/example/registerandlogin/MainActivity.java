@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
         color = new HashMap<>();
         iconView = findViewById(R.id.icon);
         setBackgroundColor();
-        System.out.println("HashMap" + color);
         Button register = findViewById(R.id.register_btn);
         Button login = findViewById(R.id.login_btn);
         SharedPreferences sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE);
@@ -71,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
                         System.out.println(response.code());
                     }
                 }
-
                 @Override
                 public void onFailure(@NonNull Call<DataModel> call, @NonNull Throwable t) {
                     System.out.println(t.getMessage());
@@ -92,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 mainActivityConstraint.setBackgroundColor(Color.parseColor("#" + color.get("accentMain")));
             }
-
             @Override
             public void onFailure(Call<ColorsGetter> call, Throwable t) {
                 System.out.println("Error");
@@ -110,17 +106,14 @@ public class MainActivity extends AppCompatActivity {
                             centerCrop().
                             into(iconView);
                     mainActivityConstraint.setVisibility(View.VISIBLE);
-
                 }
             }
 
             @Override
             public void onFailure(Call<GetIconFromDirectory> call, Throwable t) {
-
+                System.out.println(t.getMessage());
             }
         });
-
-
     }
 
     private void checkInfo() {
@@ -147,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
                         incorrectData.setVisibility(View.VISIBLE);
                     }
                 }
-
                 @Override
                 public void onFailure(Call<UserDataModel> call, Throwable t) {
                     System.out.println("Error");
@@ -167,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
         userInfo.put("username", email);
         userInfo.put("phone", phone);
         userInfo.put("image", file);
-
         String token = prefs.getString("tokenOfSignedAccount", "eroooor");
         userInfo.put("token", token);
         Intent intent = new Intent(this, AccountPageActivity.class);

@@ -79,16 +79,17 @@
                 android:textColor="@color/white"
                 android:textColorHint="@color/edit_text_bg_hint"
                 app:layout_constraintTop_toBottomOf="@id/lastName" />
+
             <TextView
                 android:id="@+id/incorrect_email_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="@id/email"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/email"
                 android:text="Incorrect Email form!!"
                 android:textColor="@color/incorrect_form_color"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/email"
+                app:layout_constraintTop_toBottomOf="@id/email" />
 
             <EditText
                 android:id="@+id/phone"

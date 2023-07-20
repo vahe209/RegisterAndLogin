@@ -1,4 +1,4 @@
-package com.example.registerandlogin;
+package com.example.registerandlogin.PathUtil;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
